@@ -1,0 +1,255 @@
+:root {
+    --primary-color: #FFAD60;
+    --primary-hover: #FF9933;
+    --background-color: #FFF5EB;
+    --text-color: #333;
+    --white: white;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    padding-bottom: 90px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--primary-color);
+    padding: 15px 20px;
+    color: var(--white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+.user-reviews-preview {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px;
+    background-color: var(--background-color);
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.user-reviews-preview::-webkit-scrollbar {
+    display: none;
+}
+
+.review-bubble {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--white);
+    border-radius: 20px;
+    padding: 10px;
+    margin-right: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.review-bubble img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.review-bubble p {
+    margin: 0;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-container {
+    width: 100%;
+    padding: 20px;
+    background-color: var(--background-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar {
+    display: flex;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.search-bar input {
+    flex-grow: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px 0 0 5px;
+    font-size: 16px;
+}
+
+.search-bar button {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-bar button:hover {
+    background-color: var(--primary-hover);
+}
+
+#map {
+    height: 50vh;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.restaurant-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+    gap: 20px;
+}
+
+.restaurant-card {
+    flex: 0 1 calc(33.333% - 20px);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--white);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.restaurant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.restaurant-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.restaurant-info {
+    padding: 15px;
+}
+
+.restaurant-info h2 {
+    margin: 0 0 10px 0;
+    color: var(--primary-color);
+}
+
+.restaurant-info p {
+    margin: 0 0 10px 0;
+    color: var(--text-color);
+}
+
+.rating {
+    color: var(--primary-color);
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+.button-container button {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button-container button:hover {
+    background-color: var(--primary-hover);
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.pagination button {
+    padding: 10px 15px;
+    margin: 0 5px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination button:hover {
+    background-color: var(--primary-hover);
+}
+
+.ad-space {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(240, 240, 240, 0.9);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#adsense-banner {
+    width: 100%;
+    max-width: 728px;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .restaurant-card {
+        flex: 0 1 calc(50% - 20px);
+    }
+
+    #adsense-banner {
+        height: 50px;
+    }
+
+    body {
+        padding-bottom: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.5em;
+    }
+
+    .restaurant-card {
+        flex: 0 1 100%;
+    }
+
+    .button-container {
+        flex-direction: column;
+    }
+
+    .button-container button {
+        margin-bottom: 10px;
+    }
+}

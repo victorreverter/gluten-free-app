@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlutenMe - Buscador de Restaurantes Sin Gluten</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <h1>GlutenMe</h1>
+        <div class="hamburger" onclick="toggleMenu()" aria-label="Abrir menú">☰</div>
+        <div class="menu" id="menu">
+            <a href="#contact">Contacto</a>
+            <a href="recomendaciones.html">Recomendaciones</a>
+        </div>
+    </div>
+    
+    <div class="user-reviews-preview" id="user-reviews-preview">
+        <!-- Aquí se mostrarán las previews de las reseñas de usuarios -->
+    </div>
+
+    <div class="search-container">
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Buscar restaurantes...">
+            <button onclick="searchRestaurants()" aria-label="Buscar"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="restaurant-list" id="restaurant-list"></div>
+
+    <div class="pagination" id="pagination"></div>
+
+    <footer class="ad-space">
+        <div id="adsense-banner">
+            <!-- Aquí irá el código de AdSense -->
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
