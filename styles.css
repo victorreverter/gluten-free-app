@@ -1,7 +1,7 @@
 :root {
-    --primary-color: #FFAD60;
-    --primary-hover: #FF9933;
-    --background-color: #FFF5EB;
+    --primary-color: #ff8238;
+    --primary-hover: #ee8c31;
+    --background-color: #eee8e3;
     --text-color: #333;
     --white: white;
 }
@@ -12,7 +12,6 @@ body {
     padding: 0;
     background-color: var(--background-color);
     color: var(--text-color);
-    padding-bottom: 90px;
 }
 
 .header {
@@ -30,86 +29,64 @@ body {
     font-size: 2em;
 }
 
-.user-reviews-preview {
-    display: flex;
-    overflow-x: auto;
-    padding: 10px;
-    background-color: var(--background-color);
-    white-space: nowrap;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.user-reviews-preview::-webkit-scrollbar {
-    display: none;
-}
-
-.review-bubble {
-    display: inline-flex;
-    align-items: center;
-    background-color: var(--white);
-    border-radius: 20px;
-    padding: 10px;
-    margin-right: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    min-width: 200px;
-    max-width: 300px;
-}
-
-.review-bubble img {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-
-.review-bubble p {
-    margin: 0;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.search-container {
-    width: 100%;
-    padding: 20px;
-    background-color: var(--background-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.search-bar {
-    display: flex;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.search-bar input {
-    flex-grow: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 5px 0 0 5px;
-    font-size: 16px;
-}
-
-.search-bar button {
-    background-color: var(--primary-color);
-    color: var(--white);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 0 5px 5px 0;
+.hamburger {
+    font-size: 24px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.search-bar button:hover {
-    background-color: var(--primary-hover);
 }
 
 #map {
     height: 50vh;
     width: 100%;
-    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.search-container {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 600px;
+    z-index: 1000;
+}
+
+.search-bar {
+    display: flex;
+    background-color: white;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar input {
+    flex-grow: 1;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+}
+
+.search-bar button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+#search-area-button {
+    position: absolute;
+    bottom: 45%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    display: none;
 }
 
 .restaurant-list {
@@ -201,38 +178,80 @@ body {
     background-color: var(--primary-hover);
 }
 
-.ad-space {
+.popup {
+    display: none;
     position: fixed;
-    bottom: 0;
+    z-index: 2000;
     left: 0;
+    top: 0;
     width: 100%;
-    background-color: rgba(240, 240, 240, 0.9);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
 }
 
-#adsense-banner {
+.popup-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.carousel {
     width: 100%;
-    max-width: 728px;
-    height: 90px;
+    height: 300px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.carousel img.active {
+    opacity: 1;
+}
+
+.popup-buttons {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.popup-buttons button {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.popup-buttons button:hover {
+    background-color: var(--primary-hover);
 }
 
 @media (max-width: 768px) {
     .restaurant-card {
         flex: 0 1 calc(50% - 20px);
-    }
-
-    #adsense-banner {
-        height: 50px;
-    }
-
-    body {
-        padding-bottom: 50px;
     }
 }
 
@@ -252,4 +271,61 @@ body {
     .button-container button {
         margin-bottom: 10px;
     }
+  /* ... (mantener los estilos anteriores) ... */
+
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 10px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.carousel {
+    width: 100%;
+    height: 300px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.carousel img.active {
+    opacity: 1;
+}
+
+
+/* ... (mantener los estilos restantes) ... */
 }

@@ -1,54 +1,64 @@
+// Configuración de Foursquare
+const fsq_api_key = 'fsq3zBmo5He0nxhtV6KnOv2WRhFHztDA1v9xFBgwd5J8jR8=';
+
 // Inicializar el mapa
-const map = L.map('map').setView([40.4168, -3.7038], 10); // Madrid
+const map = L.map('map').setView([40.4168, -3.7038], 15); // Madrid
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Generar 40 restaurantes
-const restaurants = [];
-for (let i = 0; i < 40; i++) {
-    let lat, lng;
-    if (i < 16) {
-        // Madrid centro
-        lat = 40.4168 + (Math.random() - 0.5) * 0.05;
-        lng = -3.7038 + (Math.random() - 0.5) * 0.05;
-    } else {
-        // Resto de la Comunidad de Madrid
-        lat = 40.4168 + (Math.random() - 0.5) * 0.3;
-        lng = -3.7038 + (Math.random() - 0.5) * 0.3;
-    }
-    restaurants.push({
-        name: `Restaurante ${i + 1}`,
-        description: `Descripción del restaurante ${i + 1}`,
-        lat: lat,
-        lng: lng,
-        rating: Math.floor(Math.random() * 5) + 1,
-        image: `https://picsum.photos/200/300?random=${i}`
-    });
-}
-
+let restaurants = [];
 let currentPage = 1;
 const itemsPerPage = window.innerWidth < 768 ? 6 : 12;
 
-// Generar 15 mensajes de usuario con emojis
-const userReviews = [
-    { user: "María", text: "¡Excelente comida sin gluten! 😋👍", avatar: "https://i.pravatar.cc/40?img=1" },
-    { user: "Carlos", text: "El personal es muy amable y atento. 🤗", avatar: "https://i.pravatar.cc/40?img=2" },
-    { user: "Ana", text: "Gran variedad de opciones sin gluten. 🍽️", avatar: "https://i.pravatar.cc/40?img=3" },
-    { user: "Pedro", text: "Ambiente acogedor y agradable. 🏠", avatar: "https://i.pravatar.cc/40?img=4" },
-    { user: "Laura", text: "Los precios son razonables. 💰", avatar: "https://i.pravatar.cc/40?img=5" },
-    { user: "Javier", text: "Recomiendo el postre de chocolate. 🍫", avatar: "https://i.pravatar.cc/40?img=6" },
-    { user: "Sofía", text: "Perfecto para celíacos y no celíacos. 👨‍👩‍👧‍👦", avatar: "https://i.pravatar.cc/40?img=7" },
-    { user: "Miguel", text: "La pizza sin gluten es increíble. 🍕", avatar: "https://i.pravatar.cc/40?img=8" },
-    { user: "Elena", text: "Volveré seguro, me ha encantado. 😍", avatar: "https://i.pravatar.cc/40?img=9" },
-    { user: "David", text: "Cuidado con la contaminación cruzada. ⚠️", avatar: "https://i.pravatar.cc/40?img=10" },
-    { user: "Carmen", text: "El pan sin gluten es delicioso. 🍞", avatar: "https://i.pravatar.cc/40?img=11" },
-    { user: "Pablo", text: "Menú variado y bien explicado. 📜", avatar: "https://i.pravatar.cc/40?img=12" },
-    { user: "Lucía", text: "La mejor experiencia sin gluten hasta ahora. 🏆", avatar: "https://i.pravatar.cc/40?img=13" },
-    { user: "Alberto", text: "Ideal para familias con niños celíacos. 👨‍👩‍👧‍👦", avatar: "https://i.pravatar.cc/40?img=14" },
-    { user: "Isabel", text: "Buena relación calidad-precio. 👌", avatar: "https://i.pravatar.cc/40?img=15" }
-];
+async function getRestaurants(lat, lng) {
+    const endpoint = 'https://api.foursquare.com/v3/places/search';
+    const params = new URLSearchParams({
+        query: 'sin gluten OR celiaco OR cerveza sin gluten',
+        ll: `${lat},${lng}`,
+        radius: 5000,
+        limit: 15
+    });
+
+    try {
+        const response = await fetch(`${endpoint}?${params}`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: fsq_api_key
+            }
+        });
+        const data = await response.json();
+        restaurants = data.results;
+        await getRestaurantPhotos();
+        displayRestaurants();
+        displayMapMarkers();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function getRestaurantPhotos() {
+    for (let restaurant of restaurants) {
+        const photosEndpoint = `https://api.foursquare.com/v3/places/${restaurant.fsq_id}/photos`;
+        try {
+            const response = await fetch(photosEndpoint, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: fsq_api_key
+                }
+            });
+            const data = await response.json();
+            if (data.length > 0) {
+                restaurant.photo = `${data[0].prefix}original${data[0].suffix}`;
+            }
+        } catch (error) {
+            console.error('Error fetching photos:', error);
+        }
+    }
+}
 
 function displayRestaurants(page = 1) {
     const restaurantList = document.getElementById('restaurant-list');
@@ -63,13 +73,12 @@ function displayRestaurants(page = 1) {
         const card = document.createElement('div');
         card.className = 'restaurant-card';
         card.innerHTML = `
-            <img src="${restaurant.image}" alt="${restaurant.name}">
+            <img src="${restaurant.photo || restaurant.categories[0]?.icon?.prefix + '88' + restaurant.categories[0]?.icon?.suffix}" alt="${restaurant.name}">
             <div class="restaurant-info">
                 <h2>${restaurant.name}</h2>
-                <p>${restaurant.description}</p>
-                <div class="rating">${'★'.repeat(restaurant.rating)}${'☆'.repeat(5 - restaurant.rating)}</div>
+                <p>${restaurant.location.address || 'Dirección no disponible'}</p>
                 <div class="button-container">
-                    <button><i class="fas fa-utensils"></i> Reservar</button>
+                    <button onclick="openPopup('${restaurant.fsq_id}')">Ver más</button>
                     <button><i class="fas fa-share-alt"></i> Compartir</button>
                     <button><i class="fas fa-phone"></i> Llamar</button>
                 </div>
@@ -79,9 +88,17 @@ function displayRestaurants(page = 1) {
     });
 
     restaurantList.appendChild(fragment);
+    updatePagination();
 }
 
 function displayMapMarkers() {
+    // Limpiar marcadores existentes
+    map.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+        }
+    });
+
     const customIcon = L.icon({
         iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -92,12 +109,12 @@ function displayMapMarkers() {
     });
 
     restaurants.forEach(restaurant => {
-        const marker = L.marker([restaurant.lat, restaurant.lng], {icon: customIcon}).addTo(map)
+        const marker = L.marker([restaurant.geocodes.main.latitude, restaurant.geocodes.main.longitude], {icon: customIcon}).addTo(map)
             .bindPopup(`
                 <div style="text-align: center;">
-                    <h3 style="color: #FFAD60;">${restaurant.name}</h3>
-                    <p>${restaurant.description}</p>
-                    <div style="color: #FFAD60;">${'★'.repeat(restaurant.rating)}${'☆'.repeat(5 - restaurant.rating)}</div>
+                    <h3 style="color: #ff9058;">${restaurant.name}</h3>
+                    <p>${restaurant.location.address || 'Dirección no disponible'}</p>
+                    <button onclick="openPopup('${restaurant.fsq_id}')">Ver más</button>
                 </div>
             `);
     });
@@ -115,91 +132,74 @@ function updatePagination() {
         if (e.target.tagName === 'BUTTON') {
             currentPage = parseInt(e.target.textContent);
             displayRestaurants(currentPage);
-            updatePagination();
         }
     });
 }
 
 function toggleMenu() {
-    const menu = document.getElementById('menu');
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    // Implementar la lógica del menú hamburguesa aquí
+    console.log('Menú toggled');
 }
 
 function searchRestaurants() {
     const searchTerm = document.querySelector('.search-bar input').value.toLowerCase();
     const filteredRestaurants = restaurants.filter(restaurant => 
         restaurant.name.toLowerCase().includes(searchTerm) || 
-        restaurant.description.toLowerCase().includes(searchTerm)
+        restaurant.location.address.toLowerCase().includes(searchTerm)
     );
-    displayFilteredRestaurants(filteredRestaurants);
+    restaurants = filteredRestaurants;
+    displayRestaurants();
+    displayMapMarkers();
 }
 
-function displayFilteredRestaurants(filteredRestaurants) {
-    const restaurantList = document.getElementById('restaurant-list');
-    restaurantList.innerHTML = '';
-
-    filteredRestaurants.forEach(restaurant => {
-        const card = document.createElement('div');
-        card.className = 'restaurant-card';
-        card.innerHTML = `
-            <img src="${restaurant.image}" alt="${restaurant.name}">
-            <div class="restaurant-info">
-                <h2>${restaurant.name}</h2>
-                <p>${restaurant.description}</p>
-                <div class="rating">${'★'.repeat(restaurant.rating)}${'☆'.repeat(5 - restaurant.rating)}</div>
-                <div class="button-container">
-                    <button><i class="fas fa-utensils"></i> Reservar</button>
-                    <button><i class="fas fa-share-alt"></i> Compartir</button>
-                    <button><i class="fas fa-phone"></i> Llamar</button>
-                </div>
-            </div>
-        `;
-        restaurantList.appendChild(card);
-    });
+function searchInCurrentArea() {
+    const center = map.getCenter();
+    getRestaurants(center.lat, center.lng);
 }
 
-function resizeAdsense() {
-    const adBanner = document.getElementById('adsense-banner');
-    const body = document.body;
-    if (window.innerWidth < 728) {
-        adBanner.style.height = '50px';
-        body.style.paddingBottom = '50px';
-    } else {
-        adBanner.style.height = '90px';
-        body.style.paddingBottom = '90px';
-    }
+async function openPopup(fsq_id) {
+    const restaurant = restaurants.find(r => r.fsq_id === fsq_id);
+    if (!restaurant) return;
+
+    const popup = document.getElementById('restaurant-popup');
+    const popupTitle = document.getElementById('popup-title');
+    const popupAddress = document.getElementById('popup-address');
+    const popupPhone = document.getElementById('popup-phone');
+    const popupWebsite = document.getElementById('popup-website');
+    const popupHours = document.getElementById('popup-hours');
+    const popupPrice = document.getElementById('popup-price');
+    const popupRating = document.getElementById('popup-rating');
+    const popupPopularity = document.getElementById('popup-popularity');
+    const popupDelivery = document.getElementById('popup-delivery');
+    const popupPayment = document.getElementById('popup-payment');
+    const popupMenu = document.getElementById('popup-menu');
+    const popupReviews = document.getElementById('popup-reviews');
+    const popupPromotions = document.getElementById('popup-promotions');
+
+    popupTitle.textContent = restaurant.name;
+    popupAddress.textContent = `${restaurant.location.address}, ${restaurant.location.locality}, ${restaurant.location.postcode}`;
+    popupPhone.textContent = restaurant.tel || 'Teléfono no disponible';
+    popupWebsite.innerHTML = restaurant.website ? `<a href="${restaurant.website}" target="_blank">${restaurant.website}</a>` : 'Sitio web no disponible';
+    popupHours.textContent = restaurant.hours?.display || 'Horario no disponible';
+    popupPrice.textContent = `Precio: ${restaurant.price || 'No disponible'}`;
+    popupRating.textContent = `Calificación: ${restaurant.rating || 'No disponible'}`;
+    popupPopularity.textContent = `Popularidad: ${restaurant.popularity || 'No disponible'}`;
+    popupDelivery.textContent = `Entrega: ${restaurant.delivery ? 'Disponible' : 'No disponible'}`;
+    popupPayment.textContent = `Opciones de pago: ${restaurant.payment?.join(', ') || 'No disponible'}`;
+    popupMenu.innerHTML = restaurant.menu ? `<a href="${restaurant.menu}" target="_blank">Ver menú</a>` : 'Menú no disponible';
+    popupReviews.textContent = 'Reseñas no disponibles';
+    popupPromotions.textContent = 'Promociones no disponibles';
+
+    popup.style.display = 'block';
 }
 
-function displayReviewPreviews() {
-    const previewContainer = document.getElementById('user-reviews-preview');
-    previewContainer.innerHTML = '';
-
-    userReviews.forEach(review => {
-        const bubble = document.createElement('div');
-        bubble.className = 'review-bubble';
-        bubble.innerHTML = `
-            <img src="${review.avatar}" alt="${review.user}">
-            <p>${review.text}</p>
-        `;
-        previewContainer.appendChild(bubble);
-    });
-
-    // Animación de desplazamiento automático
-    let scrollPosition = 0;
-    setInterval(() => {
-        scrollPosition += 1;
-        if (scrollPosition > previewContainer.scrollWidth - previewContainer.clientWidth) {
-            scrollPosition = 0;
-        }
-        previewContainer.scrollTo(scrollPosition, 0);
-    }, 50);
+function closePopup() {
+    document.getElementById('restaurant-popup').style.display = 'none';
 }
 
 // Inicialización
-displayRestaurants();
-displayMapMarkers();
-updatePagination();
-displayReviewPreviews();
+const initialCenter = map.getCenter();
+getRestaurants(initialCenter.lat, initialCenter.lng);
 
 // Evento para la tecla "Enter" en la barra de búsqueda
 document.querySelector('.search-bar input').addEventListener('keypress', function(e) {
@@ -208,6 +208,10 @@ document.querySelector('.search-bar input').addEventListener('keypress', functio
     }
 });
 
-// Eventos para el manejo del tamaño de la publicidad
-window.addEventListener('resize', resizeAdsense);
-resizeAdsense(); // Llamar a la función al cargar la página
+// Mostrar el botón de búsqueda en el área cuando el mapa se mueve
+map.on('moveend', function() {
+    document.getElementById('search-area-button').style.display = 'block';
+});
+
+// Evento para el botón de búsqueda en el área
+document.getElementById('search-area-button').addEventListener('click', searchInCurrentArea);
